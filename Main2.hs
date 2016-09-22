@@ -25,13 +25,7 @@ main = do
     case bar of
             Left foobar -> putStrLn "Left"
             Right barfoo -> putStrLn "Right"
+
     -- runRedis conn $ do
-    --     -- lpop items
-    --     set "foo" "123"
-    --     set "bar" "456"
-    --     -- foo <- get "foo"
-    --     foo <- get "test"
-    --     -- bar <- get "bar"
     --     bar <- lpop items
-    --     -- xs <- lpop items
     --     liftIO $ print (foo, bar)

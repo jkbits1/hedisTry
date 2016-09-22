@@ -3,7 +3,7 @@
 module Main where
 
 import Control.Concurrent
--- import qualified Data.ByteString.Char8 as B
+import Data.ByteString.Char8
 
 import Data.ByteString
 import Data.Maybe
@@ -47,9 +47,11 @@ onlyStringResult key = do
 
 initialStateNum = 1
 
+initialItems = [ "a", "b", "c" ]
+
 
 main :: IO ()
-main = stateLoop initialStateNum
+main = stateLoop initialStateNum initialItems
 --main = do   line <- getLine
 --            if null line
 --                then return ()
@@ -58,18 +60,21 @@ main = stateLoop initialStateNum
 ----                    putBoard $ head line
 --                    main
 
-stateLoop n = do
+stateLoop :: Int -> [String] -> IO ()
+stateLoop n xs = do
   conn <- connect connInfo -- defaultConnectInfo
   line <- Prelude.getLine
-  if Prelude.null line || n > 3
+  if Prelude.null line || n > 5 || Prelude.length xs < 1
     then return ()
     else do
-      result <- runRedis conn $ onlyStringResult "abc"
-      result2 <- runRedis conn $ onlyStringResult "xyz"
-      print (result, result2)
+      runRedis conn $ lpush "test1" $ (Data.ByteString.Char8.pack line) : []
+      runRedis conn $ lpush "test2" $ 
+        (Data.ByteString.Char8.pack $ Prelude.head xs) : []
+      result <- runRedis conn $ onlyStringResult "xyz"
+      print result
       -- putStrLn $ show 5
       -- runRedis conn $ do
       --     lpush "test1" ["0"]
       --     liftIO $ print (123, 345)
 
-      stateLoop $ n + 1
+      stateLoop (n + 1) (Prelude.tail xs)
